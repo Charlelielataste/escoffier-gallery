@@ -115,12 +115,9 @@ Présentation de l'événement avec navigation
 
 ## 📖 Documentation Complète
 
-- **[QUICKSTART.md](./QUICKSTART.md)** - Démarrage rapide en 5 minutes ⚡
 - **[SETUP.md](./SETUP.md)** - Configuration détaillée et optimisations
-- **[VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)** - Guide de déploiement Vercel
 - **[CLOUDINARY_BACKUP.md](./CLOUDINARY_BACKUP.md)** - Sauvegarde des médias
 - **[CLOUDINARY_FOLDERS.md](./CLOUDINARY_FOLDERS.md)** - Dynamic Folder Mode expliqué
-- **[MIGRATION_DYNAMIC_MODE.md](./MIGRATION_DYNAMIC_MODE.md)** - Migrer vers Dynamic mode
 
 ## 🤝 Contribution
 

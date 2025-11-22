@@ -175,12 +175,6 @@ export default function GalleryPage() {
           >
             Ajouter des médias
           </Link>
-          <Link
-            href="/"
-            className="inline-block w-full bg-tertiary text-white py-4 px-8 rounded-2xl font-semibold text-lg transition-all shadow-lg hover:bg-tertiary-accessible"
-          >
-            Retour à l&apos;accueil
-          </Link>
         </div>
       </div>
 

@@ -14,7 +14,7 @@ export default function HomePage() {
             Evénement du lundi 24 novembre 2025
           </p>
           <p className="text-2xl text-primary font-bold mb-4">
-            Diner de Gala de la Seconde Chance
+            Diner Seconde Chance (titre à définir)
           </p>
           <div className="flex justify-center space-x-2">
             <span className="text-2xl">📸</span>
@@ -31,7 +31,7 @@ export default function HomePage() {
             href="/upload"
             className="block bg-primary text-white py-4 px-8 rounded-2xl font-semibold text-lg transition-all shadow-lg"
           >
-            Ajouter Photos & Vidéos
+            Ajoutez Photos & Vidéos
           </Link>
           <Link
             href="/gallery"

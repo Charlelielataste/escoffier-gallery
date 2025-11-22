@@ -256,21 +256,21 @@ export default function UploadPage() {
               <Image src={logo} alt="Logo" width={100} height={100} />
             </Link>
             <h1 className="text-2xl text-primary font-bold mb-2">
-              Ajouter vos Photos & Vidéos
+              Ajoutez vos Photos & Vidéos
             </h1>
           </div>
 
           {/* Type selection */}
           <div className="bg-white/60 backdrop-blur rounded-2xl border border-pink-100 p-6 mb-6">
             <h2 className="text-lg font-semibold text-primary mb-4">
-              Type de média
+              Type de médias
             </h2>
             <div className="flex gap-4 justify-center">
               <button
                 onClick={() => setUploadType("image")}
-                className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+                className={`flex-1 py-3 px-6 rounded-xl cursor-pointer font-semibold transition-all ${
                   uploadType === "image"
-                    ? "bg-primary text-white shadow-lg"
+                    ? "bg-primary text-white border-2 border-primary shadow-lg"
                     : "bg-white text-primary border-2 border-primary"
                 }`}
               >
@@ -278,9 +278,9 @@ export default function UploadPage() {
               </button>
               <button
                 onClick={() => setUploadType("video")}
-                className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+                className={`flex-1 py-3 px-6 rounded-xl cursor-pointer font-semibold transition-all ${
                   uploadType === "video"
-                    ? "bg-secondary text-white shadow-lg"
+                    ? "bg-secondary text-white border-2 border-secondary shadow-lg"
                     : "bg-white text-secondary border-2 border-secondary"
                 }`}
               >

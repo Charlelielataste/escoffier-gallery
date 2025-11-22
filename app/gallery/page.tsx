@@ -66,9 +66,9 @@ export default function GalleryPage() {
         <div className="flex gap-4 justify-center mb-8">
           <button
             onClick={() => setActiveTab("images")}
-            className={`flex-1 max-w-xs py-3 px-6 rounded-xl font-semibold transition-all ${
+            className={`flex-1 max-w-xs py-3 px-6 rounded-xl cursor-pointer font-semibold transition-all ${
               activeTab === "images"
-                ? "bg-primary text-white shadow-lg"
+                ? "bg-primary text-white shadow-lg border-2 border-primary"
                 : "bg-white text-primary border-2 border-primary"
             }`}
           >
@@ -76,9 +76,9 @@ export default function GalleryPage() {
           </button>
           <button
             onClick={() => setActiveTab("videos")}
-            className={`flex-1 max-w-xs py-3 px-6 rounded-xl font-semibold transition-all ${
+            className={`flex-1 max-w-xs py-3 px-6 rounded-xl cursor-pointer font-semibold transition-all ${
               activeTab === "videos"
-                ? "bg-secondary text-white shadow-lg"
+                ? "bg-secondary text-white border-2 border-secondary shadow-lg"
                 : "bg-white text-secondary border-2 border-secondary"
             }`}
           >

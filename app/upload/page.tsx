@@ -334,9 +334,9 @@ export default function UploadPage() {
           <div className="space-y-4">
             <div className="bg-white/60 backdrop-blur rounded-2xl border border-pink-100 p-4">
               <p className="text-sm text-gray-600">
-                💡 <strong>Astuce :</strong> Envoyer en plusieurs fois si le
-                vous rencontrez des problèmes, ne quittez pas la page avant que
-                tous les fichiers soient uploadés.
+                💡 <strong>Astuce :</strong> Envoyez en plusieurs fois si vous
+                rencontrez des problèmes, ne quittez pas la page avant que tous
+                les fichiers soient uploadés.
               </p>
             </div>
 

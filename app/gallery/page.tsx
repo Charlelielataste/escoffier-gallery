@@ -58,7 +58,7 @@ export default function GalleryPage() {
             <Image src={logo} alt="Logo" width={100} height={100} />
           </Link>
           <h1 className="text-3xl text-primary font-bold mb-2">
-            Galerie de l&apos;événement
+            Galerie de l&apos;évènement
           </h1>
         </div>
 
@@ -120,7 +120,7 @@ export default function GalleryPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={image.secure_url}
-                      alt="Photo événement"
+                      alt="Photo évènement"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -168,12 +168,12 @@ export default function GalleryPage() {
         )}
 
         {/* Navigation */}
-        <div className="mt-8 text-center space-y-4 border-t border-primary pt-5">
+        <div className="mt-10 text-center space-y-4 border-t border-primary pt-5">
           <Link
             href="/upload"
             className="inline-block w-full bg-primary text-white py-4 px-8 rounded-2xl font-semibold text-lg transition-all shadow-lg hover:bg-primary-accessible"
           >
-            Ajouter des médias
+            Ajoutez des médias
           </Link>
         </div>
       </div>

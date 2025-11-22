@@ -11,10 +11,10 @@ export default function HomePage() {
             <Image src={logo} alt="Logo" width={200} height={200} />
           </div>
           <p className="text-lg text-primary font-bold mb-4">
-            Evénement du lundi 24 novembre 2025
+            Évènement du lundi 24 novembre 2025
           </p>
           <p className="text-2xl text-primary font-bold mb-4">
-            Diner Seconde Chance (titre à définir)
+            Dîner d&apos;Épicure de la Deuxième Chance
           </p>
           <div className="flex justify-center space-x-2">
             <span className="text-2xl">📸</span>
@@ -53,7 +53,7 @@ export default function HomePage() {
               </p>
               <p>
                 🎨 <strong>Galerie :</strong> Découvrez la galerie de
-                l&apos;événement
+                l&apos;évènement
               </p>
             </div>
           </div>

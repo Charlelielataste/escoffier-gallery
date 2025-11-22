@@ -13,13 +13,14 @@ interface CloudinaryResource {
 // Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
 });
 
 export async function GET() {
   try {
-    const assetFolder = process.env.CLOUDINARY_FOLDER || "escoffier-event";
+    const assetFolder =
+      process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "escoffier-event";
 
     // Common video formats
     const videoFormats = [

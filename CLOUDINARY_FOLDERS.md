@@ -59,7 +59,7 @@ Dans notre code (`app/api/upload/route.ts`), nous utilisons les paramètres opti
 ```typescript
 cloudinary.uploader.upload_stream({
   resource_type: type === "video" ? "video" : "image",
-  asset_folder: process.env.CLOUDINARY_FOLDER || "escoffier-event",
+  asset_folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "escoffier-event",
   use_filename_as_display_name: true,
   unique_filename: true,
   use_asset_folder_as_public_id_prefix: true,
@@ -172,7 +172,7 @@ cloudinary.uploader.upload_stream({
   resource_type: type === "video" ? "video" : "image",
 
   // Dossier dans le Media Library
-  asset_folder: process.env.CLOUDINARY_FOLDER,
+  asset_folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER,
 
   // Utilise le nom du fichier comme display_name
   use_filename_as_display_name: true,

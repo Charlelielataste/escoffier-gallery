@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/logo-escoffier.png";
+import { Play } from "lucide-react";
 
 interface CloudinaryResource {
   public_id: string;
@@ -22,6 +23,9 @@ export default function GalleryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const [selectedMedia, setSelectedMedia] = useState<CloudinaryResource | null>(
+    null
+  );
 
   useEffect(() => {
     fetchMedia();
@@ -37,10 +41,6 @@ export default function GalleryPage() {
       }
 
       const data = await response.json();
-
-      // Debug logging
-      console.log("Videos API response:", data);
-      console.log("Videos count:", data.videos?.length || 0);
 
       setVideos(data.videos || []);
       setNextCursor(data.nextCursor);
@@ -97,6 +97,14 @@ export default function GalleryPage() {
     };
   }, [hasMore, loadingMore, loadMoreVideos]);
 
+  const openModal = (media: CloudinaryResource) => {
+    setSelectedMedia(media);
+  };
+
+  const closeModal = () => {
+    setSelectedMedia(null);
+  };
+
   return (
     <div className="min-h-screen py-8 px-4 bg-container">
       <div className="max-w-xl mx-auto">
@@ -148,21 +156,26 @@ export default function GalleryPage() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {videos.map((video) => (
-                    <div
+                    <button
                       key={video.public_id}
-                      className="bg-white rounded-xl overflow-hidden shadow-lg"
+                      type="button"
+                      onClick={() => openModal(video)}
+                      className="aspect-square relative bg-white rounded-xl overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition-transform"
                     >
                       <video
                         src={video.secure_url}
-                        controls
-                        className="w-full"
+                        className="w-full h-full object-cover"
                         preload="metadata"
+                        controls={false}
                       >
                         Votre navigateur ne supporte pas la lecture de vidéos.
                       </video>
-                    </div>
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 size-14 rounded-full flex items-center justify-center">
+                        <Play className="text-secondary size-10" />
+                      </div>
+                    </button>
                   ))}
                 </div>
                 {/* Infinite scroll trigger */}
@@ -188,6 +201,29 @@ export default function GalleryPage() {
           </Link>
         </div>
       </div>
+      {selectedMedia && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={closeModal}
+        >
+          <div className="relative max-w-6xl flex items-center justify-center h-full w-full max-h-[70vh]">
+            <button
+              onClick={closeModal}
+              className="absolute -top-18 right-3 text-white text-4xl font-bold hover:text-gray-300"
+            >
+              ×
+            </button>
+            <video
+              src={selectedMedia.secure_url}
+              controls
+              className="w-full"
+              preload="metadata"
+            >
+              Votre navigateur ne supporte pas la lecture de vidéos.
+            </video>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

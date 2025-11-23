@@ -34,7 +34,7 @@ export default function HomePage() {
             Ajoutez Photos & Vidéos
           </Link>
           <Link
-            href="/gallery"
+            href="/gallery/pictures"
             className="block bg-secondary text-white py-4 px-8 rounded-2xl font-semibold text-lg transition-all shadow-lg"
           >
             Voir la Galerie

@@ -250,7 +250,7 @@ export default function UploadPage() {
       />
 
       <div className="min-h-screen flex flex-col items-center justify-center py-10 bg-container">
-        <div className="text-center max-w-2xl mx-auto px-4 w-full">
+        <div className="text-center max-w-xl mx-auto px-4 w-full">
           <div className="mb-8">
             <Link href="/" className="inline-block mb-4">
               <Image src={logo} alt="Logo" width={100} height={100} />
@@ -341,7 +341,7 @@ export default function UploadPage() {
             </div>
 
             <Link
-              href="/gallery"
+              href="/gallery/pictures"
               className="block bg-secondary text-white py-4 px-8 rounded-2xl font-semibold text-lg transition-all shadow-lg hover:bg-secondary-accessible"
             >
               Voir la Galerie

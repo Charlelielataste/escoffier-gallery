@@ -13,6 +13,8 @@ interface CloudinaryResource {
   width: number;
   height: number;
   resource_type: string;
+  thumbnail_url?: string;
+  full_url?: string; // High quality for modal
 }
 
 export default function GalleryPage() {
@@ -24,6 +26,7 @@ export default function GalleryPage() {
   const [selectedMedia, setSelectedMedia] = useState<CloudinaryResource | null>(
     null
   );
+  const [imageLoading, setImageLoading] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -89,10 +92,12 @@ export default function GalleryPage() {
 
   const openModal = (media: CloudinaryResource) => {
     setSelectedMedia(media);
+    setImageLoading(true);
   };
 
   const closeModal = () => {
     setSelectedMedia(null);
+    setImageLoading(false);
   };
 
   return (
@@ -160,9 +165,9 @@ export default function GalleryPage() {
                       <Image
                         src={image.secure_url}
                         alt="Photo évènement"
-                        width={20}
-                        height={20}
-                        sizes="20px"
+                        width={400}
+                        height={400}
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         unoptimized
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -203,17 +208,30 @@ export default function GalleryPage() {
           <div className="relative max-w-6xl h-full w-full max-h-[70vh]">
             <button
               onClick={closeModal}
-              className="absolute -top-12 right-2 text-white text-4xl font-bold hover:text-gray-300"
+              className="absolute -top-12 right-2 text-white text-4xl font-bold hover:text-gray-300 z-10"
             >
               ×
             </button>
+
+            {/* Loading spinner */}
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
+              </div>
+            )}
+
             <Image
-              src={selectedMedia.secure_url}
+              src={selectedMedia.full_url || selectedMedia.secure_url}
               alt="Photo en grand"
               fill
               unoptimized
-              className="max-w-full object-contain rounded-lg"
-              loading="lazy"
+              className={`max-w-full object-contain rounded-lg transition-opacity duration-300 ${
+                imageLoading ? "opacity-0" : "opacity-100"
+              }`}
+              loading="eager"
+              quality={90}
+              onLoad={() => setImageLoading(false)}
+              onError={() => setImageLoading(false)}
             />
           </div>
         </div>

@@ -10,6 +10,8 @@ interface CloudinaryResource {
   created_at: string;
   width?: number;
   height?: number;
+  thumbnail_url?: string; // For videos
+  full_url?: string; // High quality for modal
 }
 
 // Cloudinary configuration
@@ -42,28 +44,69 @@ export async function GET(request: NextRequest) {
     ];
 
     // Fetch images with pagination
+    // Use resources API with prefix filter (more reliable than resources_by_asset_folder)
     let images: CloudinaryResource[] = [];
     let nextCursor: string | undefined = undefined;
 
     try {
-      const imagesResponse = await cloudinary.api.resources_by_asset_folder(
-        assetFolder,
-        {
-          resource_type: "image",
-          max_results: maxResults,
-          next_cursor: cursor,
-        }
-      );
+      // Use Search API which properly supports sorting and pagination
+      // This ensures consistent ordering across pages
+      const searchExpression = `asset_folder:${assetFolder} AND resource_type:image`;
 
-      const allResources = imagesResponse.resources || [];
-      nextCursor = imagesResponse.next_cursor;
+      // Build search query with proper sorting
+      let searchQuery = cloudinary.search
+        .expression(searchExpression)
+        .sort_by("created_at", "desc")
+        .max_results(maxResults);
 
-      // Safety filter: ensure images don't have video format and are actually images
-      images = allResources.filter(
+      // Add cursor if provided for pagination
+      if (cursor) {
+        searchQuery = searchQuery.next_cursor(cursor);
+      }
+
+      const searchResponse = await searchQuery.execute();
+
+      const allResources = (searchResponse.resources ||
+        []) as CloudinaryResource[];
+      nextCursor = searchResponse.next_cursor;
+
+      // Safety filter: ensure images don't have video format
+      // Search API should already filter by resource_type, but double-check
+      const filteredResources = allResources.filter(
         (resource) =>
           resource.resource_type === "image" &&
-          !videoFormats.includes(resource.format?.toLowerCase())
+          !videoFormats.includes(resource.format?.toLowerCase()) &&
+          resource.public_id?.startsWith(`${assetFolder}/`)
       );
+
+      // Generate optimized URLs for thumbnails (grid view) and full size (modal)
+      images = filteredResources.map((resource) => {
+        // Generate optimized URL for grid (400x400, auto quality, auto format)
+        const optimizedUrl = cloudinary.url(resource.public_id, {
+          resource_type: "image",
+          width: 400,
+          height: 400,
+          crop: "fill",
+          quality: "auto",
+          fetch_format: "auto", // WebP if supported
+          gravity: "auto", // Smart cropping
+        });
+
+        // Generate high quality URL for modal (max 1920px width, auto quality)
+        // Keep original aspect ratio, just limit max width
+        const fullUrl = cloudinary.url(resource.public_id, {
+          resource_type: "image",
+          width: 1400,
+          quality: "auto",
+          fetch_format: "auto",
+        });
+
+        return {
+          ...resource,
+          secure_url: optimizedUrl, // Optimized for grid
+          full_url: fullUrl, // High quality for modal
+        };
+      });
     } catch (err) {
       console.error("Error fetching images:", err);
     }

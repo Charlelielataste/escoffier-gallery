@@ -14,6 +14,7 @@ interface CloudinaryResource {
   width: number;
   height: number;
   resource_type: string;
+  thumbnail_url?: string;
 }
 
 export default function GalleryPage() {
@@ -164,14 +165,24 @@ export default function GalleryPage() {
                       onClick={() => openModal(video)}
                       className="aspect-square relative bg-white rounded-xl overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition-transform"
                     >
-                      <video
-                        src={video.secure_url}
-                        className="w-full h-full object-cover"
-                        preload="metadata"
-                        controls={false}
-                      >
-                        Votre navigateur ne supporte pas la lecture de vidéos.
-                      </video>
+                      {video.thumbnail_url ? (
+                        <Image
+                          src={video.thumbnail_url}
+                          alt="Vidéo évènement"
+                          width={400}
+                          height={400}
+                          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          unoptimized
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full bg-primary h-full object-cover flex items-end justify-center">
+                          <p className="text-sm pb-5 text-white font-semibold">
+                            Aperçu non disponible
+                          </p>
+                        </div>
+                      )}
                       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 size-14 rounded-full flex items-center justify-center">
                         <Play className="text-secondary size-10" />
                       </div>
@@ -216,8 +227,8 @@ export default function GalleryPage() {
             <video
               src={selectedMedia.secure_url}
               controls
-              className="w-full"
-              preload="metadata"
+              className="w-full max-h-[70vh]"
+              preload="auto"
             >
               Votre navigateur ne supporte pas la lecture de vidéos.
             </video>

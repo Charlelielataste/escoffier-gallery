@@ -10,6 +10,7 @@ interface CloudinaryResource {
   created_at: string;
   width?: number;
   height?: number;
+  thumbnail_url?: string; // For videos
 }
 
 // Cloudinary configuration
@@ -27,52 +28,70 @@ export async function GET(request: NextRequest) {
     // Get pagination parameters
     const searchParams = request.nextUrl.searchParams;
     const cursor = searchParams.get("cursor") || undefined;
-    const maxResults = 5; // 5 videos per page
-
-    // Common video formats
-    const videoFormats = [
-      "mp4",
-      "mov",
-      "avi",
-      "webm",
-      "mkv",
-      "flv",
-      "wmv",
-      "m4v",
-    ];
+    const maxResults = 6; // 6 videos per page
 
     // Fetch videos with pagination
+    // Use resources API with prefix filter (more reliable than resources_by_asset_folder)
     let videos: CloudinaryResource[] = [];
     let nextCursor: string | undefined = undefined;
 
     try {
-      const options: Record<string, unknown> = {
-        resource_type: "video",
-        max_results: maxResults,
-      };
+      // Use Search API which properly supports sorting and pagination
+      // This ensures consistent ordering across pages
+      const searchExpression = `asset_folder:${assetFolder} AND resource_type:video`;
 
-      // Add cursor only if provided
+      // Build search query with proper sorting
+      let searchQuery = cloudinary.search
+        .expression(searchExpression)
+        .sort_by("created_at", "desc")
+        .max_results(maxResults);
+
+      // Add cursor if provided for pagination
       if (cursor) {
-        options.next_cursor = cursor;
+        searchQuery = searchQuery.next_cursor(cursor);
       }
 
-      const videosResponse = await cloudinary.api.resources_by_asset_folder(
-        assetFolder,
-        options
-      );
+      const searchResponse = await searchQuery.execute();
 
-      const allResources = videosResponse.resources || [];
-      nextCursor = videosResponse.next_cursor;
+      const allResources = (searchResponse.resources ||
+        []) as CloudinaryResource[];
+      nextCursor = searchResponse.next_cursor;
 
-      // Filter to keep only actual videos
-      // Cloudinary sometimes returns images even when requesting video type
-      videos = allResources.filter((resource) => {
-        const isVideoResourceType = resource.resource_type === "video";
-        const isVideoFormat =
-          resource.format &&
-          videoFormats.includes(resource.format.toLowerCase());
+      // Filter to ensure only videos from the correct folder
+      // Search API should already filter by resource_type, but double-check
+      const filteredResources = allResources.filter((resource) => {
+        return (
+          resource.resource_type === "video" &&
+          resource.public_id?.startsWith(`${assetFolder}/`)
+        );
+      });
 
-        return isVideoResourceType || isVideoFormat;
+      // Generate optimized URLs and thumbnails for videos
+      videos = filteredResources.map((resource) => {
+        // Generate thumbnail for grid view (400x400, JPG)
+        const thumbnailUrl = cloudinary.url(resource.public_id, {
+          resource_type: "video",
+          format: "jpg",
+          width: 400,
+          height: 400,
+          crop: "fill",
+          quality: "auto",
+          gravity: "auto",
+        });
+
+        // Generate optimized video URL (lower quality for faster loading)
+        const optimizedVideoUrl = cloudinary.url(resource.public_id, {
+          resource_type: "video",
+          quality: "auto:low",
+          fetch_format: "auto",
+          width: 1280, // Limit resolution for faster loading
+        });
+
+        return {
+          ...resource,
+          secure_url: optimizedVideoUrl, // Optimized video URL
+          thumbnail_url: thumbnailUrl, // Thumbnail for grid
+        };
       });
     } catch (err) {
       console.error("Error fetching videos:", err);

@@ -151,21 +151,23 @@ export default function GalleryPage() {
               <>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {images.map((image) => (
-                    <div
+                    <button
                       key={image.public_id}
                       className="aspect-square bg-white rounded-xl overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                      type="button"
                       onClick={() => openModal(image)}
                     >
                       <Image
                         src={image.secure_url}
                         alt="Photo évènement"
-                        width={200}
-                        height={200}
+                        width={20}
+                        height={20}
+                        sizes="20px"
                         unoptimized
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
                 {/* Infinite scroll trigger */}

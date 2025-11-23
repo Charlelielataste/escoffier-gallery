@@ -51,8 +51,7 @@ export default function UploadPage() {
     return typeof window !== "undefined" && !!window.cloudinary;
   });
 
-  const handleUploadSuccess = (result: CloudinaryUploadResult) => {
-    console.log("Upload réussi:", result.info);
+  const handleUploadSuccess = () => {
     setUploadSuccess(true);
     setUploadError("");
 
@@ -228,11 +227,10 @@ export default function UploadPage() {
             }
           }
 
-          handleUploadSuccess(result);
+          handleUploadSuccess();
         }
 
         if (result && result.event === "close") {
-          console.log("Widget closed");
           totalUploadedSize = 0;
         }
       }

@@ -94,17 +94,16 @@ export async function GET(request: NextRequest) {
 
         // Generate high quality URL for modal (max 1080px width, auto quality)
         // Keep original aspect ratio, just limit max width (optimisé pour réduire bandwidth)
-        const fullUrl = cloudinary.url(resource.public_id, {
-          resource_type: "image",
-          width: 1080,
-          quality: "auto",
-          fetch_format: "auto",
-        });
+        // const fullUrl = cloudinary.url(resource.public_id, {
+        //   resource_type: "image",
+        //   width: 1080,
+        //   quality: "auto",
+        //   fetch_format: "auto",
+        // });
 
         return {
           ...resource,
           secure_url: optimizedUrl, // Optimized for grid
-          full_url: fullUrl, // High quality for modal
         };
       });
     } catch (err) {

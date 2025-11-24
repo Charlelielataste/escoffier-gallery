@@ -228,7 +228,7 @@ export default function GalleryPage() {
               src={selectedMedia.secure_url}
               controls
               className="w-full max-h-[70vh]"
-              preload="auto"
+              preload="metadata"
             >
               Votre navigateur ne supporte pas la lecture de vidéos.
             </video>

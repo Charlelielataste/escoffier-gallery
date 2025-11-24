@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Get pagination parameters
     const searchParams = request.nextUrl.searchParams;
     const cursor = searchParams.get("cursor") || undefined;
-    const maxResults = 10; // 10 images per page
+    const maxResults = 8; // 8 images per page (optimisé pour réduire les transformations)
 
     // Common video formats to filter out
     const videoFormats = [
@@ -92,11 +92,11 @@ export async function GET(request: NextRequest) {
           gravity: "auto", // Smart cropping
         });
 
-        // Generate high quality URL for modal (max 1920px width, auto quality)
-        // Keep original aspect ratio, just limit max width
+        // Generate high quality URL for modal (max 1080px width, auto quality)
+        // Keep original aspect ratio, just limit max width (optimisé pour réduire bandwidth)
         const fullUrl = cloudinary.url(resource.public_id, {
           resource_type: "image",
-          width: 1400,
+          width: 1080,
           quality: "auto",
           fetch_format: "auto",
         });
@@ -111,11 +111,19 @@ export async function GET(request: NextRequest) {
       console.error("Error fetching images:", err);
     }
 
-    return NextResponse.json({
-      images,
-      nextCursor: nextCursor || null,
-      hasMore: !!nextCursor,
-    });
+    return NextResponse.json(
+      {
+        images,
+        nextCursor: nextCursor || null,
+        hasMore: !!nextCursor,
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "public, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      }
+    );
   } catch (error) {
     console.error("Images fetch error:", error);
     return NextResponse.json(

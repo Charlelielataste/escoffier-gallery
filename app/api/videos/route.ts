@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     // Get pagination parameters
     const searchParams = request.nextUrl.searchParams;
     const cursor = searchParams.get("cursor") || undefined;
-    const maxResults = 6; // 6 videos per page
+    const maxResults = 4; // 4 videos per page (optimisé pour réduire les transformations)
 
     // Fetch videos with pagination
     // Use resources API with prefix filter (more reliable than resources_by_asset_folder)
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
           resource_type: "video",
           quality: "auto:low",
           fetch_format: "auto",
-          width: 1280, // Limit resolution for faster loading
+          width: 720, // Limit resolution to 720p (optimisé pour réduire bandwidth)
         });
 
         return {
@@ -97,11 +97,19 @@ export async function GET(request: NextRequest) {
       console.error("Error fetching videos:", err);
     }
 
-    return NextResponse.json({
-      videos,
-      nextCursor: nextCursor || null,
-      hasMore: !!nextCursor,
-    });
+    return NextResponse.json(
+      {
+        videos,
+        nextCursor: nextCursor || null,
+        hasMore: !!nextCursor,
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "public, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      }
+    );
   } catch (error) {
     console.error("Videos fetch error:", error);
     return NextResponse.json(

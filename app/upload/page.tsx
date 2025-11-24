@@ -57,12 +57,17 @@ export default function UploadPage() {
 
     setTimeout(() => {
       setUploadSuccess(false);
-    }, 5000);
+    }, 10000); // 10 secondes (doublé)
   };
 
   const handleUploadError = (error: Error) => {
     console.error("Upload error:", error);
     setUploadError("Erreur lors de l'upload. Veuillez réessayer.");
+
+    // Auto-hide après 10 secondes
+    setTimeout(() => {
+      setUploadError("");
+    }, 10000);
   };
 
   const openCloudinaryWidget = () => {
@@ -248,6 +253,28 @@ export default function UploadPage() {
       />
 
       <div className="min-h-screen flex flex-col items-center justify-center py-10 bg-container">
+        {/* Toast de succès fixé en haut */}
+        {uploadSuccess && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-5 fade-in duration-300">
+            <div className="bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 min-w-[300px] max-w-md">
+              <span className="text-2xl">✅</span>
+              <p className="font-semibold">
+                Upload réussi ! Vos fichiers sont en ligne.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Toast d'erreur fixé en haut */}
+        {uploadError && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-5 fade-in duration-300">
+            <div className="bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 min-w-[300px] max-w-md">
+              <span className="text-2xl">❌</span>
+              <p className="font-semibold">{uploadError}</p>
+            </div>
+          </div>
+        )}
+
         <div className="text-center max-w-xl mx-auto px-4 w-full">
           <div className="mb-8">
             <Link href="/" className="inline-block mb-4">
@@ -314,18 +341,6 @@ export default function UploadPage() {
                 </div>
               </button>
             </div>
-
-            {uploadSuccess && (
-              <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-xl">
-                ✅ Upload réussi ! Vos fichiers sont en ligne.
-              </div>
-            )}
-
-            {uploadError && (
-              <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-xl">
-                ❌ {uploadError}
-              </div>
-            )}
           </div>
 
           {/* Info and navigation */}

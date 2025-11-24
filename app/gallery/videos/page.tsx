@@ -132,6 +132,11 @@ export default function GalleryPage() {
           </div>
         </div>
 
+        <p className="text-center text-sm text-gray-600 mb-10">
+          Les vidéos peuvent mettre du temps à s&apos;afficher apres les avoir
+          ajoutées. (1min maximum)
+        </p>
+
         {/* Loading */}
         {loading && (
           <div className="text-center py-12">

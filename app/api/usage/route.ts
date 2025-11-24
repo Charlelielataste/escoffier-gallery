@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -7,32 +7,67 @@ cloudinary.config({
   api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
+    // Vérifier que les credentials sont présents
+    if (
+      !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+      !process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY ||
+      !process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+    ) {
+      return NextResponse.json(
+        { error: "Cloudinary credentials not configured" },
+        { status: 500 }
+      );
+    }
+
     // Récupérer les stats d'usage
     const usage = await cloudinary.api.usage();
 
-    // Calculer les pourcentages
-    const transformationsUsed = usage.transformations?.used || 0;
-    const transformationsLimit = usage.transformations?.limit || 25000;
-    const transformationsPercent =
-      (transformationsUsed / transformationsLimit) * 100;
+    // Debug: log la réponse complète en développement
+    if (process.env.NODE_ENV === "development") {
+      console.log("Cloudinary usage response:", JSON.stringify(usage, null, 2));
+    }
 
-    const bandwidthUsed = usage.bandwidth?.used || 0;
-    const bandwidthLimit = usage.bandwidth?.limit || 25000000000; // 25 GB en bytes
-    const bandwidthPercent = (bandwidthUsed / bandwidthLimit) * 100;
+    // Vérifier que usage existe
+    if (!usage) {
+      return NextResponse.json(
+        { error: "No usage data returned from Cloudinary" },
+        { status: 500 }
+      );
+    }
 
-    const storageUsed = usage.storage?.used || 0;
-    const storageLimit = usage.storage?.limit || 26843545600; // 25 GB en bytes
-    const storagePercent = (storageUsed / storageLimit) * 100;
+    // Extraire les données de la réponse Cloudinary
+    // Structure réelle : transformations.usage, bandwidth.usage, storage.usage
+    const transformationsUsed = usage.transformations?.usage || 0;
+    const transformationsCredits = usage.transformations?.credits_usage || 0;
+    // Pour le plan gratuit, on utilise les crédits comme limite (25 crédits/mois)
+    const creditsLimit = usage.credits?.limit || 25;
+    const creditsUsed = usage.credits?.usage || 0;
+    const creditsPercent = usage.credits?.used_percent || 0;
+
+    const bandwidthUsed = usage.bandwidth?.usage || 0;
+    const bandwidthLimit = 25 * 1024 * 1024 * 1024; // 25 GB en bytes (plan gratuit)
+    const bandwidthPercent =
+      bandwidthLimit > 0 ? (bandwidthUsed / bandwidthLimit) * 100 : 0;
+
+    const storageUsed = usage.storage?.usage || 0;
+    const storageLimit = 25 * 1024 * 1024 * 1024; // 25 GB en bytes (plan gratuit)
+    const storagePercent =
+      storageLimit > 0 ? (storageUsed / storageLimit) * 100 : 0;
 
     return NextResponse.json(
       {
+        credits: {
+          used: creditsUsed,
+          limit: creditsLimit,
+          percent: Math.round(creditsPercent * 100) / 100,
+          remaining: creditsLimit - creditsUsed,
+        },
         transformations: {
           used: transformationsUsed,
-          limit: transformationsLimit,
-          percent: Math.round(transformationsPercent * 100) / 100,
-          remaining: transformationsLimit - transformationsUsed,
+          creditsUsed: transformationsCredits,
+          // Pas de limite directe, on utilise les crédits
         },
         bandwidth: {
           used: bandwidthUsed,
@@ -60,7 +95,9 @@ export async function GET(request: NextRequest) {
             1024
           ).toFixed(2),
         },
-        resetDate: usage.plan?.reset_at || null,
+        resetDate: usage.rate_limit_reset_at || null,
+        resources: usage.resources || 0,
+        impressions: usage.impressions?.usage || 0,
       },
       {
         headers: {
@@ -70,10 +107,19 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error("Usage fetch error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const errorStack =
+      error instanceof Error && process.env.NODE_ENV === "development"
+        ? error.stack
+        : undefined;
     return NextResponse.json(
-      { error: "Failed to fetch usage" },
+      {
+        error: "Failed to fetch usage",
+        message: errorMessage,
+        details: errorStack,
+      },
       { status: 500 }
     );
   }
 }
-

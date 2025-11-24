@@ -221,7 +221,7 @@ export default function GalleryPage() {
             )}
 
             <Image
-              src={selectedMedia.secure_url}
+              src={selectedMedia.full_url || selectedMedia.secure_url}
               alt="Photo en grand"
               fill
               unoptimized

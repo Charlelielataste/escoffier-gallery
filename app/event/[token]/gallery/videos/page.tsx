@@ -114,7 +114,14 @@ export default function GalleryPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href={`/event/${token}`} className="inline-block mb-4">
-            <Image src={logo} alt="Logo" width={100} height={100} priority style={{ width: "auto", height: "auto" }} />
+            <Image
+              src={logo}
+              alt="Logo"
+              width={100}
+              height={100}
+              priority
+              style={{ width: "auto", height: "auto" }}
+            />
           </Link>
           <h1 className="text-3xl text-primary font-bold mb-2">
             Galerie de l&apos;évènement
@@ -136,7 +143,7 @@ export default function GalleryPage() {
 
         <p className="text-center text-sm text-gray-600 mb-10">
           Les vidéos peuvent mettre du temps à s&apos;afficher apres les avoir
-          ajoutées. (1min maximum)
+          ajoutées.
         </p>
 
         {/* Loading */}

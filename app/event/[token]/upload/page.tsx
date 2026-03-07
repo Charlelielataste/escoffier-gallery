@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/public/logo-escoffier.png";
+import logo from "@/public/logo-10-escoffier.png";
 import Script from "next/script";
 
 // Upload limits
@@ -33,7 +34,7 @@ declare global {
     cloudinary: {
       createUploadWidget: (
         options: Record<string, unknown>,
-        callback: (error: Error | null, result: CloudinaryUploadResult) => void
+        callback: (error: Error | null, result: CloudinaryUploadResult) => void,
       ) => {
         open: () => void;
         close: () => void;
@@ -43,6 +44,7 @@ declare global {
 }
 
 export default function UploadPage() {
+  const { token } = useParams<{ token: string }>();
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [uploadType, setUploadType] = useState<"image" | "video">("image");
@@ -74,7 +76,7 @@ export default function UploadPage() {
     // Check if Cloudinary is available
     if (typeof window === "undefined" || !window.cloudinary) {
       setUploadError(
-        "Le widget Cloudinary n'est pas chargé. Veuillez rafraîchir la page."
+        "Le widget Cloudinary n'est pas chargé. Veuillez rafraîchir la page.",
       );
       return;
     }
@@ -96,13 +98,16 @@ export default function UploadPage() {
         cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
         uploadSignature: async (
           callback: (signature: string) => void,
-          paramsToSign: Record<string, unknown>
+          paramsToSign: Record<string, unknown>,
         ) => {
           try {
             const response = await fetch("/api/cloudinary-signature", {
               method: "POST",
               body: JSON.stringify({ paramsToSign }),
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                "x-event-token": token,
+              },
             });
             const data = await response.json();
             callback(data.signature);
@@ -225,7 +230,7 @@ export default function UploadPage() {
             if (totalUploadedSize > limits.maxTotalSize) {
               const limitSize = isVideo ? "1 GB" : "100 MB";
               setUploadError(
-                `Limite dépassée ! Maximum ${limitSize} au total.`
+                `Limite dépassée ! Maximum ${limitSize} au total.`,
               );
               widget.close();
               return;
@@ -238,7 +243,7 @@ export default function UploadPage() {
         if (result && result.event === "close") {
           totalUploadedSize = 0;
         }
-      }
+      },
     );
 
     widget.open();
@@ -277,8 +282,8 @@ export default function UploadPage() {
 
         <div className="text-center max-w-xl mx-auto px-4 w-full">
           <div className="mb-8">
-            <Link href="/" className="inline-block mb-4">
-              <Image src={logo} alt="Logo" width={100} height={100} />
+            <Link href={`/event/${token}`} className="inline-block mb-4">
+              <Image src={logo} alt="Logo" width={100} height={100} priority style={{ width: "auto", height: "auto" }} />
             </Link>
             <h1 className="text-2xl text-primary font-bold mb-2">
               Ajoutez vos Photos & Vidéos
@@ -354,7 +359,7 @@ export default function UploadPage() {
             </div>
 
             <Link
-              href="/gallery/pictures"
+              href={`/event/${token}/gallery/pictures`}
               className="block bg-secondary text-white py-4 px-8 rounded-2xl font-semibold text-lg transition-all shadow-lg hover:bg-secondary-accessible"
             >
               Voir la Galerie

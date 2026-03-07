@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/public/logo-escoffier.png";
+import { CldImage } from "next-cloudinary";
+import logo from "@/public/logo-10-escoffier.png";
 
 interface CloudinaryResource {
   public_id: string;
@@ -18,13 +20,14 @@ interface CloudinaryResource {
 }
 
 export default function GalleryPage() {
+  const { token } = useParams<{ token: string }>();
   const [images, setImages] = useState<CloudinaryResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [selectedMedia, setSelectedMedia] = useState<CloudinaryResource | null>(
-    null
+    null,
   );
   const [imageLoading, setImageLoading] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -75,7 +78,7 @@ export default function GalleryPage() {
           loadMoreImages();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     const currentTarget = observerTarget.current;
@@ -105,8 +108,8 @@ export default function GalleryPage() {
       <div className="max-w-xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-4">
-            <Image src={logo} alt="Logo" width={100} height={100} />
+          <Link href={`/event/${token}`} className="inline-block mb-4">
+            <Image src={logo} alt="Logo" width={100} height={100} priority style={{ width: "auto", height: "auto" }} />
           </Link>
           <h1 className="text-3xl text-primary font-bold mb-2">
             Galerie de l&apos;évènement
@@ -116,13 +119,13 @@ export default function GalleryPage() {
         {/* Tabs */}
         <div className="flex gap-4 justify-center mb-8">
           <Link
-            href="/gallery/pictures"
+            href={`/event/${token}/gallery/pictures`}
             className="flex-1 max-w-xs text-center py-3 px-6 bg-primary text-white shadow-lg border-2 border-primary rounded-xl cursor-pointer font-semibold transition-all"
           >
             📸 Photos ({images.length})
           </Link>
           <Link
-            href="/gallery/videos"
+            href={`/event/${token}/gallery/videos`}
             className="flex-1 max-w-xs py-3 text-center px-6 text-secondary border-2 border-secondary shadow-lg rounded-xl cursor-pointer font-semibold transition-all hover:bg-secondary/80 hover:text-white"
           >
             🎬 Vidéos
@@ -151,7 +154,7 @@ export default function GalleryPage() {
                   Aucune photo pour le moment
                 </p>
                 <Link
-                  href="/upload"
+                  href={`/event/${token}/upload`}
                   className="inline-block bg-primary text-white py-3 px-6 rounded-xl font-semibold"
                 >
                   Ajouter des photos
@@ -167,13 +170,14 @@ export default function GalleryPage() {
                       type="button"
                       onClick={() => openModal(image)}
                     >
-                      <Image
-                        src={image.secure_url}
+                      <CldImage
+                        src={image.public_id}
                         alt="Photo évènement"
                         width={400}
                         height={400}
+                        crop="fill"
+                        gravity="auto"
                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                        unoptimized
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -196,7 +200,7 @@ export default function GalleryPage() {
         {/* Navigation */}
         <div className="mt-10 text-center space-y-4 border-t border-primary pt-5">
           <Link
-            href="/upload"
+            href={`/event/${token}/upload`}
             className="inline-block w-full bg-primary text-white py-4 px-8 rounded-2xl font-semibold text-lg transition-all shadow-lg hover:bg-primary-accessible"
           >
             Ajoutez des médias
@@ -225,16 +229,16 @@ export default function GalleryPage() {
               </div>
             )}
 
-            <Image
-              src={selectedMedia.full_url || selectedMedia.secure_url}
+            <CldImage
+              src={selectedMedia.public_id}
               alt="Photo en grand"
               fill
-              unoptimized
+              sizes="100vw"
+              quality="auto:good"
               className={`max-w-full object-contain rounded-lg transition-opacity duration-300 ${
                 imageLoading ? "opacity-0" : "opacity-100"
               }`}
               loading="eager"
-              quality={90}
               onLoad={() => setImageLoading(false)}
               onError={() => setImageLoading(false)}
             />

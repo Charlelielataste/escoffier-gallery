@@ -25,6 +25,7 @@ export default function GalleryPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
   const observerTarget = useRef<HTMLDivElement>(null);
   const [selectedMedia, setSelectedMedia] = useState<CloudinaryResource | null>(
     null,
@@ -48,11 +49,13 @@ export default function GalleryPage() {
       setVideos(data.videos || []);
       setNextCursor(data.nextCursor);
       setHasMore(data.hasMore || false);
+      setTotalCount(data.totalCount || 0);
     } catch (error) {
       console.error("Media loading error:", error);
       // Set empty array on error to show the "no videos" message
       setVideos([]);
       setHasMore(false);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -137,7 +140,7 @@ export default function GalleryPage() {
             📸 Photos
           </Link>
           <div className="flex-1 max-w-xs py-3 text-center px-6 bg-secondary text-white border-2 border-secondary shadow-lg rounded-xl cursor-pointer font-semibold transition-all">
-            🎬 Vidéos ({videos.length})
+            🎬 Vidéos ({totalCount})
           </div>
         </div>
 

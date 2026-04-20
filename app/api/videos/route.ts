@@ -44,6 +44,7 @@ function getCachedVideos(cursor?: string) {
       const allResources = (searchResponse.resources ||
         []) as CloudinaryResource[];
       const nextCursor = searchResponse.next_cursor;
+      const totalCount = searchResponse.total_count ?? 0;
 
       const filteredResources = allResources.filter((resource) => {
         return (
@@ -81,10 +82,11 @@ function getCachedVideos(cursor?: string) {
         videos,
         nextCursor: nextCursor || null,
         hasMore: !!nextCursor,
+        totalCount,
       };
     },
     ["cloudinary-videos", cursor ?? "initial"],
-    { revalidate: 60 }
+    { revalidate: 60, tags: ["cloudinary-videos"] }
   )();
 }
 

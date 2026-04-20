@@ -15,7 +15,7 @@ const LIMITS = {
   },
   videos: {
     maxFiles: 5,
-    maxTotalSize: 1024 * 1024 * 1024, // 1 GB total
+    maxTotalSize: 100 * 1024 * 1024, // 100 MB total (Cloudinary plan limit)
   },
 };
 
@@ -124,7 +124,7 @@ export default function UploadPage() {
 
         // Chunked upload for videos
         chunkedUpload: isVideo,
-        maxChunkSize: isVideo ? 6000000 : undefined,
+        maxChunkSize: isVideo ? 6000000 : undefined, // 6MB chunks
 
         clientAllowedFormats: isVideo
           ? ["mp4", "mov", "avi", "webm", "mkv"]
@@ -238,6 +238,16 @@ export default function UploadPage() {
           }
 
           handleUploadSuccess();
+
+          // Invalidate cache so new uploads appear immediately in gallery
+          fetch("/api/revalidate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-event-token": token,
+            },
+            body: JSON.stringify({ type: uploadType }),
+          }).catch(() => {});
         }
 
         if (result && result.event === "close") {
@@ -283,7 +293,14 @@ export default function UploadPage() {
         <div className="text-center max-w-xl mx-auto px-4 w-full">
           <div className="mb-8">
             <Link href={`/event/${token}`} className="inline-block mb-4">
-              <Image src={logo} alt="Logo" width={100} height={100} priority style={{ width: "auto", height: "auto" }} />
+              <Image
+                src={logo}
+                alt="Logo"
+                width={100}
+                height={100}
+                priority
+                style={{ width: "auto", height: "auto" }}
+              />
             </Link>
             <h1 className="text-2xl text-primary font-bold mb-2">
               Ajoutez vos Photos & Vidéos
@@ -341,7 +358,7 @@ export default function UploadPage() {
                   <p className="text-sm text-gray-500">
                     {uploadType === "image"
                       ? "JPG, PNG, GIF - Max 20 fichiers / 100 MB total"
-                      : "MP4, MOV, AVI, WebM - Max 5 fichiers / 1 GB total"}
+                      : "MP4, MOV, AVI, WebM - Max 5 fichiers / 100 MB par fichier"}
                   </p>
                 </div>
               </button>

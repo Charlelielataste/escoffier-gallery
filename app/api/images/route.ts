@@ -55,6 +55,7 @@ function getCachedImages(cursor?: string) {
       const allResources = (searchResponse.resources ||
         []) as CloudinaryResource[];
       const nextCursor = searchResponse.next_cursor;
+      const totalCount = searchResponse.total_count ?? 0;
 
       const images = allResources.filter(
         (resource) =>
@@ -67,10 +68,11 @@ function getCachedImages(cursor?: string) {
         images,
         nextCursor: nextCursor || null,
         hasMore: !!nextCursor,
+        totalCount,
       };
     },
     ["cloudinary-images", cursor ?? "initial"],
-    { revalidate: 60 }
+    { revalidate: 60, tags: ["cloudinary-images"] }
   )();
 }
 

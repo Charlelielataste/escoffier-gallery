@@ -8,14 +8,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { type } = body;
-
-    if (type === "video") {
-      revalidateTag("cloudinary-videos");
-    } else {
-      revalidateTag("cloudinary-images");
-    }
+    revalidateTag("cloudinary-images", "max");
+    revalidateTag("cloudinary-videos", "max");
 
     return NextResponse.json({ revalidated: true });
   } catch (error) {
